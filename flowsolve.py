@@ -91,6 +91,7 @@ Direcciones = {
 	3 : 'r',
 }
 
+
 direcciones_posibles = {
     (0,1) : 'tb',
     (0,2) : 'tl',
@@ -103,6 +104,7 @@ direcciones_posibles = {
 OenCasilla = Logica.Descriptor([Nx,Ny,Nc,Nd])
 pos_t = defineMap(mapa)
 
+
 def regla_1():
     Y_xy = []
     for x in X:
@@ -110,13 +112,27 @@ def regla_1():
             if (x,y) not in pos_t:
                 O_d = []
                 for d in direcciones_posibles.keys():
-                    pq = [Logica.Ytoria([OenCasilla.P([x,y,c,d[0]]),OenCasilla.P([x,y,c,d[1]])]) for c in C]
+                    pq = [Logica.Ytoria([OenCasilla.P([x,y,c,d[0]]),OenCasilla.P([x,y,c,d[1]])]) for c in C] 
                     pq = Logica.Otoria(pq)
                     O_d.append(pq)
                 Y_xy.append(Logica.Otoria(O_d))
     return Logica.Ytoria(Y_xy)
 
 
-M = resolver(regla_1())
+def regla_2():
+    Y_xy = []
+    for x in X:
+        for y in Y:
+            if (x,y) not in pos_t:
+                O_c = []
+                for c in C:
+                    nq = [OenCasilla.P([x,y,nc,d]) for nc in C if nc != c for d in D]
+                    q = [OenCasilla.P([x,y,c,d]) for d in D]
+                    formula = "("+Logica.Otoria(q)+"Y-"+Logica.Otoria(nq)+")"
+                    O_c.append(formula)
+                Y_xy.append(Logica.Otoria(O_c))
+    return Logica.Ytoria(Y_xy)
+
+M = resolver(Logica.Ytoria([regla_1(),regla_2()]))
 for i in M:
     print(OenCasilla.inv(i))
