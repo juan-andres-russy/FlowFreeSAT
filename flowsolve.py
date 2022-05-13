@@ -104,20 +104,16 @@ OenCasilla = Logica.Descriptor([Nx,Ny,Nc,Nd])
 pos_t = defineMap(mapa)
 
 def regla_1():
-    #cada casilla diferente de casillas terminales debe tener un solo color
     Y_xy = []
     for x in X:
         for y in Y:
-            if (x,y) not in pos_t.keys():
-                O_c = []
-                for c in C:
-                    O_d = []
-                    for d in D:
-                        ocd = Logica.Otoria([OenCasilla.P([x,y,u,d]) for u in C if u != c])
-                        formula = "("+OenCasilla.P([x,y,c,d])+"Y-"+ocd+")"
-                        O_d.append(formula)
-                    O_c.append(Logica.Otoria(O_d))
-                Y_xy.append(Logica.Otoria(O_c))
+            if (x,y) not in pos_t:
+                O_d = []
+                for d in direcciones_posibles.keys():
+                    pq = [Logica.Ytoria([OenCasilla.P([x,y,c,d[0]]),OenCasilla.P([x,y,c,d[1]])]) for c in C]
+                    pq = Logica.Otoria(pq)
+                    O_d.append(pq)
+                Y_xy.append(Logica.Otoria(O_d))
     return Logica.Ytoria(Y_xy)
 
 
