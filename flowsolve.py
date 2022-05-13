@@ -8,10 +8,16 @@ def FlowRead(MAP_FILE):
 
 def defineMap(matriz):
     dic = {}
+    dic_a = {
+        'R' : 0,
+        'G' : 1,
+        'B' : 2,
+        'O' : 3
+    }
     for y in range(len(matriz)):
         for x in range(len(matriz[y])):
             if matriz[y][x] in ['R','G','B','O']:
-                dic[(x,y)] = matriz[y][x]
+                dic[(x,y)] = dic_a[matriz[y][x]]
     return dic
 
 def topico(tsei,intdict):
@@ -109,7 +115,7 @@ def regla_1():
     Y_xy = []
     for x in X:
         for y in Y:
-            if (x,y) not in pos_t:
+            if (x,y) not in pos_t.keys():
                 O_d = []
                 for d in direcciones_posibles.keys():
                     pq = [Logica.Ytoria([OenCasilla.P([x,y,c,d[0]]),OenCasilla.P([x,y,c,d[1]])]) for c in C] 
@@ -133,6 +139,33 @@ def regla_2():
                 Y_xy.append(Logica.Otoria(O_c))
     return Logica.Ytoria(Y_xy)
 
-M = resolver(Logica.Ytoria([regla_1(),regla_2()]))
+def vectort(T,vecino_escogido):
+    if vecino_escogido[0] == T[0] + 1:
+        return 2
+    elif vecino_escogido[0] == T[0] - 1:
+        return 3
+    elif vecino_escogido[1] == T[1] + 1:
+        return 0
+    elif vecino_escogido[1] == T[1] - 1:
+        return 1
+
+def regla_3():
+    Y_pos_t = []
+    for T in pos_t.keys():
+        vecinos = [(x,y) for x in X for y in Y if ((x,y) not in pos_t.keys()) and (((x+1==T[0] or x-1==T[0])and y==T[1]) or ((y+1==T[1] or y-1==T[1])and x==T[0]))]
+        O_par_t = []
+        for vecino_escogido in vecinos:
+            otros_vecinos = [i for i in vecinos if i!=vecino_escogido]
+            vtp = OenCasilla.P([vecino_escogido[0],vecino_escogido[1],pos_t[T],vectort(T,vecino_escogido)])
+            ovtotal = []
+            for ov in otros_vecinos:
+                ovc = [OenCasilla.P([ov[0],ov[1],pos_t[T],dd]) for dd in D]
+                ovtotal.append(Logica.Otoria(ovc))
+            formula = "("+vtp+"Y-"+Logica.Otoria(ovtotal)+")"
+            O_par_t.append(formula)
+        Y_pos_t.append(Logica.Otoria(O_par_t))
+    return Logica.Ytoria(Y_pos_t)
+
+M = resolver(Logica.Ytoria([regla_1(),regla_2(),regla_3()]))
 for i in M:
-    print(OenCasilla.inv(i))
+   print(OenCasilla.inv(i))
