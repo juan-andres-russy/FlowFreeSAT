@@ -91,6 +91,15 @@ Direcciones = {
 	3 : 'r',
 }
 
+direcciones_posibles = {
+    (0,1) : 'tb',
+    (0,2) : 'tl',
+    (0,3) : 'tr',
+    (1,2) : 'bl',
+    (1,3) : 'br',
+    (2,3) : 'lr'
+}
+
 OenCasilla = Logica.Descriptor([Nx,Ny,Nc,Nd])
 pos_t = defineMap(mapa)
 
